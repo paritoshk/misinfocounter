@@ -1,8 +1,8 @@
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="https://hackathon.radiantai.com/misinfocounter/openai",
-    api_key="rad-e3c09efb1e702d4f6810e51df2c9724185b106dfe24154ec54c048d2e9f11940-iant",
+    base_url="",
+    api_key="",
 )
 
 prompt_text = "Once upon a time, in a far-off land, there was a brave knight"
