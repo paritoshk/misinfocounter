@@ -1,0 +1,76 @@
+[tool.poetry]
+name = "misinfocounter"
+description = ""
+authors = ["Paritosh Kulkarni <>", "Justin Ricaurte"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+# cli
+click = "*"
+
+# topic modeling
+BERTopic = { extras = ["visualization"], version = "*" }
+
+pandas = "*"
+
+# orm
+mongoengine = "*"
+
+# database
+asyncpg = "*"
+alembic = "*"
+
+# typing
+pydantic = "*"
+
+# logging
+structlog = "*"
+
+# http calls
+httpx = "*"
+
+# async
+anyio = "*"
+greenlet = "*"
+
+# web framework
+fastapi = "*"
+
+# web server
+uvicorn = "*"
+
+# html templates
+jinja2 = "*"
+
+# html forms
+starlette-wtf = "*"
+
+# background job processing
+taskiq = "*"
+taskiq-redis = "*"
+
+[tool.poetry.dev-dependencies]
+# test framework
+pytest = "*"
+pytest-asyncio = "*"
+
+# environment
+python-dotenv = "*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+# pyproject.toml
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = [
+    "tests",
+]
+env = [
+    "ENV=test",
+]
