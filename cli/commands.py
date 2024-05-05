@@ -4,7 +4,7 @@ from data_analysis.send_data_to_mongo import send_test_data_to_mongo, \
     send_news_article_data_to_mongo_raw, send_news_article_data_to_mongo_with_sentiments, \
     use_llm_to_add_topic_features
 from topic_models.news_source_topic_model import run_news_topic_model
-
+from counternews.generate_counter import change_tone
 
 def add_cli_commands(cli):
     """
@@ -44,3 +44,7 @@ def add_cli_commands(cli):
     @cli.command("add_topics_to_articles_via_llm")
     def add_topics_to_articles_via_llm():
         asyncio.run(use_llm_to_add_topic_features())
+
+    @cli.command("refute_article_via_llm")
+    def refute_article_via_llm():
+       response=change_tone("This is a test")
