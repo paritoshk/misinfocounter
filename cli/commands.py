@@ -7,6 +7,7 @@ from data_analysis.send_data_to_mongo import send_test_data_to_mongo, \
     use_llm_to_add_topic_features, create_embeddings_for_documents, \
     create_embeddings_for_raw_documents, import_new_article_file_to_mongo
 from data_analysis.simplified_sentiment_analyzer import analyze_news_sentiment
+from data_analysis.topic_counter import find_most_common_topics
 from topic_models.news_source_topic_model import run_news_topic_model
 
 def add_cli_commands(cli):
@@ -73,3 +74,16 @@ def add_cli_commands(cli):
     @click.argument("file")
     def import_new_file_to_mongo_articles(file: str):
        asyncio.run(import_new_article_file_to_mongo(file))
+
+    @cli.command("count_popular_topics")
+    def count_popular_topics():
+        """
+        Counts and returns the frequency of each topic in descending order.
+
+        Args:
+        topic_list (list of str): A list containing the topics of articles.
+
+        Returns:
+        list of tuple: A list of tuples where each tuple contains a topic and its corresponding frequency, sorted by frequency in descending order.
+        """
+        asyncio.run(find_most_common_topics())

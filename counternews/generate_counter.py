@@ -156,10 +156,10 @@ async def change_tone(tone, word_count, topic):
       - {article["country"]}: {article["source_name"]} {article["title"]}
         URL: {article["original_url"]} 
         Major Topic: {article["llm_major_topic"]}
-        Topics: {",".join(article["llm_topics"])}
+        Topics: {",".join(article.get("llm_topics", []))}
         Sentiment: {",".join(article["sentiment"])}
-        Entities Discussed: {",".join(article["llm_entities"])}
-        People Discussed: {",".join(article["llm_people"])}
+        Entities Discussed: {",".join(article.get("llm_entities", []))}
+        People Discussed: {",".join(article.get("llm_people", []))}
       
     """
   return response + "\n\n\n" + references
