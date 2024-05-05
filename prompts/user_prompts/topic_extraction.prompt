@@ -22,6 +22,8 @@ When analyzing the article, we want you to focus on identifying the topics of th
 
 In your response, provide the following information:
 * `id`: the id of the article
+* `entity`: the primary entity this article is about.
+* `person`: the primary person this article is about.
 * `major_topic`: the major topic umbrella that this article is dicsussing
 * `topic`: the topics that were extracted.
 * `content`: the continent the article is writing about
@@ -33,6 +35,8 @@ And output the following data:
 {
     "id": str,
     "title": str,
+    "entity": str,
+    "person": str,
     "major_topic": str,
     "topic": str,
     "continent": str,

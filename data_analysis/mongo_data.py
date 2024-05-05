@@ -7,7 +7,7 @@ def get_news_source_groupings():
     pipeline = [
         {
             "$group": {
-                "source_name": "$source_name",  # Group by the 'source' field
+                "_id": "$source_name",  # Group by the 'source' field
                 "count": {"$sum": 1}  # Count the occurrences of each source
             }
         },
@@ -15,7 +15,6 @@ def get_news_source_groupings():
             "$sort": {"count": -1}  # Optional: sort by the count, descending
         }
     ]
-
     results = misinfocounter_collection.aggregate(pipeline)
     return results
 

@@ -140,17 +140,20 @@ async def use_llm_to_add_topic_features():
     source_names = get_news_source_groupings()
 
     for source_name in source_names:
+        print(f"source_name: {source_name["_id"]}")
         misinfocounter_database = MONGO_CLIENT["misinfocounter"]
         misinfocounter_collection = misinfocounter_database.get_collection("news_article_sentiments")
         pipeline = [
-            {"$match": {"source_name": source_name}},
-            {"$sample": {"size": 100}},
+            {"$match": {"source_name": source_name["_id"]}},
+            {"$sample": {"size": 20}},
         ]
-        articles = misinfocounter_collection.find(pipeline)
+        articles = misinfocounter_collection.aggregate(pipeline)
+
         # article_path = Path(CONFIG.root_path).joinpath("data/sample.json")
         # article_text = await article_path.read_text()
         # articles = json.loads(str(article_text))
         for news_article in articles:
+            # print(f"news_article: {news_article}")
             if "llm_topic" in news_article and news_article["llm_topic"] is not None:
                 continue
             article_topic_feature = await get_topic_for_article({
@@ -159,7 +162,9 @@ async def use_llm_to_add_topic_features():
             })
             print(f"article_topic_feature: {json.dumps(article_topic_feature, indent=4)}")
             news_article["llm_major_topic"] = article_topic_feature["major_topic"]
+            news_article["llm_entity"] = article_topic_feature["entity"]
+            news_article["llm_person"] = article_topic_feature["person"]
             news_article["llm_topic"] = article_topic_feature["topic"]
             news_article["llm_continent"] = article_topic_feature["continent"]
             news_article["llm_country"] = article_topic_feature["country"]
-            misinfocounter_collection.update_one({"id": news_article["id"]}, news_article)
+            misinfocounter_collection.replace_one({"_id": news_article["_id"]}, news_article)
