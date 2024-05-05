@@ -2,7 +2,9 @@ import asyncio
 
 from data_analysis.send_data_to_mongo import send_test_data_to_mongo, \
     send_news_article_data_to_mongo_raw, send_news_article_data_to_mongo_with_sentiments, \
-    use_llm_to_add_topic_features
+    use_llm_to_add_topic_features, create_embeddings_for_documents, \
+    create_embeddings_for_raw_documents
+from data_analysis.simplified_sentiment_analyzer import analyze_news_sentiment
 from topic_models.news_source_topic_model import run_news_topic_model
 
 
@@ -44,3 +46,15 @@ def add_cli_commands(cli):
     @cli.command("add_topics_to_articles_via_llm")
     def add_topics_to_articles_via_llm():
         asyncio.run(use_llm_to_add_topic_features())
+
+    @cli.command("add_embeddings_to_articles")
+    def add_embeddings_to_articles():
+        asyncio.run(create_embeddings_for_documents())
+
+    @cli.command("add_embeddings_to_articles_for_raw")
+    def add_embeddings_to_articles_for_raw():
+        asyncio.run(create_embeddings_for_raw_documents())
+
+    @cli.command("analyze_sentiment")
+    def analyze_sentiment():
+        asyncio.run(analyze_news_sentiment())

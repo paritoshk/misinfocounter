@@ -5,6 +5,8 @@ import pickle
 
 import pandas
 from typing import Any
+from sentence_transformers import SentenceTransformer
+
 
 from client.mongo_client import MONGO_CLIENT
 
@@ -50,7 +52,6 @@ async def send_news_article_data_to_mongo_raw():
     misinfocounter_collection = misinfocounter_database.get_collection("news_articles_raw")
 
     if misinfocounter_collection.count_documents({}) == 0:
-        misinfocounter_collection.delete_many()
         misinfocounter_collection.insert_many(usa_rows)
         misinfocounter_collection.insert_many(china_rows)
         misinfocounter_collection.insert_many(russia_rows)
@@ -127,6 +128,8 @@ async def build_news_records(path: str, country: str) -> list[dict[str, Any]]:
             news_row["original_url"] = model_row["Original URL"]
         if "Title" in model_row:
             news_row["title"] = model_row["Title"]
+        if "Content" in model_row:
+            news_row["content"] = model_row["Content"]
         news_rows.append(news_row)
 
     return news_rows
@@ -168,3 +171,42 @@ async def use_llm_to_add_topic_features():
             news_article["llm_continent"] = article_topic_feature["continent"]
             news_article["llm_country"] = article_topic_feature["country"]
             misinfocounter_collection.replace_one({"_id": news_article["_id"]}, news_article)
+
+
+async def create_embeddings_for_documents():
+    model = SentenceTransformer('all-MiniLM-L6-v2')  # Load a pre-trained model
+    misinfocounter_database = MONGO_CLIENT["misinfocounter"]
+    misinfocounter_collection = misinfocounter_database.get_collection("news_article_sentiments")
+    articles = misinfocounter_collection.find()
+
+    # article_path = Path(CONFIG.root_path).joinpath("data/sample.json")
+    # article_text = await article_path.read_text()
+    # articles = json.loads(str(article_text))
+    for news_article in articles:
+        embeddings = model.encode(f"{news_article["title"]}\n{news_article["content"]}")
+
+        embedding_list = [float(num) for num in embeddings]
+        misinfocounter_collection.update_one({"_id": news_article["_id"]}, {"$set": {"embedding": embedding_list}}, upsert=True)
+
+
+async def create_embeddings_for_raw_documents():
+    model = SentenceTransformer('thenlper/gte-large')  # Load a pre-trained model
+    misinfocounter_database = MONGO_CLIENT["misinfocounter"]
+    misinfocounter_collection = misinfocounter_database.get_collection("news_articles_raw")
+    articles = misinfocounter_collection.find()
+
+    # article_path = Path(CONFIG.root_path).joinpath("data/sample.json")
+    # article_text = await article_path.read_text()
+    # articles = json.loads(str(article_text))
+    for news_article in articles:
+        embeddings = model.encode(f"{news_article["title"]}\n{news_article["content"]}")
+
+        embedding_list = [float(num) for num in embeddings]
+        misinfocounter_collection.update_one({"_id": news_article["_id"]}, {"$set": {"embedding": embedding_list}}, upsert=True)
+
+
+async def import_article_file_to_mongo():
+    """
+
+    :return:
+    """
