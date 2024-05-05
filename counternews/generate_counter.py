@@ -1,6 +1,8 @@
 # Use LLM to generate a version of the article / article title that changes
 # the tone/narrative from the original narrative
 import json
+
+import torch
 from anyio import Path
 
 from openai import OpenAI
@@ -46,12 +48,12 @@ async def find_articles(topic: str):
   misinfocounter_collection = misinfocounter_database.get_collection(
     "news_articles_sentiment_and_embeddings")
 
-  china_articles_found = await find_articles_for_country("china", topic_embedding)
-  russia_articles_found = await find_articles_for_country("russia", topic_embedding)
+  china_articles_found = await find_articles_for_country_with_torch("china", topic_embedding)
+  russia_articles_found = await find_articles_for_country_with_torch("russia", topic_embedding)
 
   return china_articles_found + russia_articles_found
 
-async def find_articles_for_country(country, topic_embedding):
+async def find_articles_for_country_with_faiss(country, topic_embedding):
   """
 
   :param country:
@@ -79,6 +81,37 @@ async def find_articles_for_country(country, topic_embedding):
 
   return filtered_articles
 
+async def find_articles_for_country_with_torch(country, topic_embedding):
+  """
+
+  :param country:
+  :param topic_embedding:
+  :return:
+  """
+  json_file_for_import = Path(CONFIG.root_path).joinpath(f"data/sentiment_{country}.json")
+  articles_text = await json_file_for_import.read_text()
+  articles = json.loads(articles_text)
+
+  article_embeddings = []
+  for article in articles:
+    article_embeddings.append(article["embedding"])
+
+  data = torch.tensor(article_embeddings, dtype=torch.float32)
+  query = torch.tensor([topic_embedding], dtype=torch.float32)  # Make the query two-dimensional
+
+  data_norm = data / data.norm(dim=1, keepdim=True)
+  query_norm = query / query.norm(dim=1, keepdim=True)
+  # Compute cosine similarities using matrix multiplication
+  cos_similarities = torch.mm(query_norm, data_norm.transpose(0, 1))
+  # Extract top 3 nearest neighbors based on cosine similarities
+  top_n_values, indices = torch.topk(cos_similarities, 3, largest=True)
+
+  filtered_articles = []
+  for index in indices.tolist()[0]:
+    filtered_articles.append(articles[index])
+
+  return filtered_articles
+
 
 async def change_tone(tone, word_count, topic):
   print(f"refuting: `{topic}` with {tone} tone up to {word_count} words")
@@ -93,7 +126,9 @@ async def change_tone(tone, word_count, topic):
       "content": article["content"],
       "country": article["country"],
     })
-  user_prompt_text = json.dump(china_articles)
+  article_string = json.dumps(china_articles_filtered)
+  user_prompt_text = (f"The topic at hand is {topic} and the following articles have been written by our adversaries:\n"
+                      f"{article_string}")
 
   print(f"sending prompt to openai")
   response = client.chat.completions.create(
@@ -112,8 +147,22 @@ async def change_tone(tone, word_count, topic):
     max_tokens=500,
     top_p=1
   )
-  print(f"user_prompt:\n{user_prompt_text}")
-  return response.choices[0].message.content
+
+  response = response.choices[0].message.content
+
+  references = "References:\n"
+  for article in china_articles:
+    references += f"""
+      - {article["country"]}: {article["source_name"]} {article["title"]}
+        URL: {article["original_url"]} 
+        Major Topic: {article["llm_major_topic"]}
+        Topics: {",".join(article["llm_topics"])}
+        Sentiment: {",".join(article["sentiment"])}
+        Entities Discussed: {",".join(article["llm_entities"])}
+        People Discussed: {",".join(article["llm_people"])}
+        "
+    """
+  return response + "\n\n\n" + references
 
 
 # test code
