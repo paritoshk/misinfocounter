@@ -160,7 +160,7 @@ async def change_tone(tone, word_count, topic):
         Sentiment: {",".join(article["sentiment"])}
         Entities Discussed: {",".join(article["llm_entities"])}
         People Discussed: {",".join(article["llm_people"])}
-        "
+      
     """
   return response + "\n\n\n" + references
 
