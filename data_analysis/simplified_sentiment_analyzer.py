@@ -112,7 +112,7 @@ async def process_sentiment(rows: list[dict[str, Any]], analyzer: SentimentAnaly
         except Exception as e:
             print(f"Failed to analyze sentiment: {e}")
             traceback.print_exc()
-        model = SentenceTransformer('thenlper/gte-large')  # Load a pre-trained model
+        model = SentenceTransformer('thenlper/gte-small')  # Load a pre-trained model
         row['embedding'] = [float(num) for num in model.encode(row["content"])]
 
         article_topic_feature = await get_topic_for_article({

@@ -54,6 +54,7 @@ taskiq-redis = "*"
 
 # run data scripts
 jupyter = "^1.0.0"
+faiss-cpu = "*"
 
 # api
 openai = "*"

@@ -63,9 +63,10 @@ def add_cli_commands(cli):
     @cli.command("refute_article_via_llm")
     @click.argument("tone")
     @click.argument("word_count")
-    def refute_article_via_llm(tone: str, word_count: int):
+    @click.argument("topic")
+    def refute_article_via_llm(tone: str, word_count: int, topic: str):
         from counternews.generate_counter import change_tone
-        response = change_tone(tone, word_count)
+        response = asyncio.run(change_tone(tone, word_count, topic))
         print(f"RESPONSE for tone {tone}\n\n{response}")
 
     @cli.command("import_new_file_to_mongo_articles")
