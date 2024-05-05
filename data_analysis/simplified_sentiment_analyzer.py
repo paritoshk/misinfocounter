@@ -51,9 +51,9 @@ async def analyze_news_sentiment():
     misinfocounter_database = MONGO_CLIENT["misinfocounter"]
     misinfocounter_collection = misinfocounter_database.get_collection("news_articles_sentiment_and_embeddings")
 
-    usa_rows_filtered = usa_rows[:20]
-    china_rows_filtered = china_rows[:20]
-    russia_rows_filtered = russia_rows[:20]
+    usa_rows_filtered = usa_rows[:100]
+    china_rows_filtered = china_rows[:100]
+    russia_rows_filtered = russia_rows[:100]
     # store in json
     await process_sentiment(usa_rows_filtered, SentimentAnalyzer())
     await process_sentiment(china_rows_filtered, SentimentAnalyzer())
