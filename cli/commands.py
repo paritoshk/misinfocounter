@@ -6,7 +6,7 @@ from data_analysis.send_data_to_mongo import send_test_data_to_mongo, \
     create_embeddings_for_raw_documents
 from data_analysis.simplified_sentiment_analyzer import analyze_news_sentiment
 from topic_models.news_source_topic_model import run_news_topic_model
-
+from counternews.generate_counter import change_tone
 
 def add_cli_commands(cli):
     """
@@ -58,3 +58,7 @@ def add_cli_commands(cli):
     @cli.command("analyze_sentiment")
     def analyze_sentiment():
         asyncio.run(analyze_news_sentiment())
+
+    @cli.command("refute_article_via_llm")
+    def refute_article_via_llm():
+       response=change_tone("This is a test")

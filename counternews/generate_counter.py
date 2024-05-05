@@ -1,16 +1,34 @@
 # Use LLM to generate a version of the article / article title that changes
 # the tone/narrative from the original narrative
-
 from openai import OpenAI
+import os
+import sys
+
+OPENAPI_URL=os.environ.get('OPENAPI_URL')
+OPENAPI_KEY=os.environ.get('OPENAPI_KEY')
+MODEL=os.environ.get('MODEL')
+
+if OPENAPI_URL is None or OPENAPI_URL == '':
+  print('Error: OPENAPI_URL environment variable is not set.')
+  sys.exit(1)
+
+if OPENAPI_KEY is None or OPENAPI_KEY == '':
+  print('Error: OPENAPI_KEY environment variable is not set.')
+  sys.exit(1)
+
+if MODEL is None or MODEL == '':
+  print('Error: MODEL environment variable is not set.')
+  sys.exit(1)
+
 
 client = OpenAI(
-    base_url="",
-    api_key="",
+    base_url=OPENAPI_URL,
+    api_key=OPENAPI_KEY,
 )
 
 def change_tone (article_text):
   response = client.chat.completions.create(
-    model="gpt-4",
+    model=MODEL,
     messages=[
       {
         "role": "system",
@@ -26,3 +44,11 @@ def change_tone (article_text):
     top_p=1
   )
   return response.choices[0].message.content
+
+
+# test code
+
+article_text="Donald Trump fell asleep once again during his hush money trial, including a 'critical' moment of proceedings, a legal expert has said.  Norm Eisen, who served as a special counsel to the House Judiciary Committee during the former president's first impeachment, told CNN that Trump was asleep in the New York court on Friday as his former White House aide Hope Hicks was answering questions under oath."
+rewritten_text=change_tone (article_text)
+print ('Original article: \n' + article_text)
+print ('Rewritten article: \n' + rewritten_text)
