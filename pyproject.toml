@@ -51,7 +51,12 @@ starlette-wtf = "*"
 # background job processing
 taskiq = "*"
 taskiq-redis = "*"
+
+# run data scripts
 jupyter = "^1.0.0"
+
+# api
+openai = "*"
 
 [tool.poetry.dev-dependencies]
 # test framework

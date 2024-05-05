@@ -1,15 +1,82 @@
+You are going to analyze an article that is provided to you in the following format:
 
-
-Please take the following article and
 
 ```json
 {
     "id": "",
     "title": "",
     "content": "",
-    "sentiment": "",
-    "topic": ""
+    "sentiment_scores: [
+        {
+            "label": str,
+            "score": float,
+        },
+    ],
 }
 ```
+
+The article format is defined as:
+* `id` the id of the article
+* `title`: the title of the article
+* `content`: the topics that are discussed in the article
+* `sentiment_scores`: the sentiment scores generally for the article itself in how it's written
+
+In each sentiment provided in `sentiment_scores`, you will be provided with:
+* `label`: the sentiment that was analyzed
+* `score`: the sentiment score for how the article was generally written.
+
+When analyzing the article, we want you to focus on identifying the topics of the article that are discussed and the sentiment that is expressed for each topic.
+
+In your response, provide the following information:
+* `id`: the id of the article
+* `topics`: the topics that were extracted.
+
+Within each `topic` provide the following:
+* `topic`: the topic name
+* `sentiment`: the sentiment from the list below that most represents how the article feels about the topic.
+* `quote`: the quote that best highlights the sentiment of the topic.
+* `sentiment_score`: a score that is a decimal number with values between 0.00000 and 1.00000 where 0.00000 is not highly feeling that sentiment and 1.00000 is very highly feeling that sentiment. Provide your own sentiment for the topic on how the article represents that specific topic. Do not provide the overall article sentiment as the score. Provide your own score. We believe in you.
+
+For the sentiments, choose the emotion that most closely ties to it from the following list.
+* `neutral`
+* `sadness`
+* `approval`
+* `realization`
+* `disappointment`
+* `fear`
+* `annoyance`
+* `desire`
+* `optimism`
+* `caring`
+* `nervousness`
+* `disgust`
+* `disapproval`
+* `grief`
+* `anger`
+* `joy`
+* `relief`
+* `remorse`
+* `embarrassment`
+* `surprise`
+* `excitement`
+* `love`
+* `amusement`
+* `curiosity`
+* `confusion`
+* `pride`
+* `admiration`
+* `gratitude`
+
+And output the following data:
+
+```json
+{
+    "id": str,
+    "title": str,
+    "topic": str,
+}
+```
+
+When providing the response, make sure to provide a complete json response. Do not leave a partial response.
 
 ===== ARTICLE =====

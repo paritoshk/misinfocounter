@@ -10,7 +10,9 @@ from client.mongo_client import MONGO_CLIENT
 
 from anyio import Path
 
+from client.openai_client import get_topic_for_article
 from config import CONFIG
+from data_analysis.mongo_data import get_news_source_groupings
 
 
 def send_test_data_to_mongo():
@@ -91,7 +93,7 @@ def build_pickle_news_records(path: str, country: str):
         row["country"] = country
 
         # TODO: generate embedding of title and content
-        row["embedding"] =
+        # row["embedding"] =
 
     return all_rows_as_dicts
 
@@ -128,3 +130,36 @@ async def build_news_records(path: str, country: str) -> list[dict[str, Any]]:
         news_rows.append(news_row)
 
     return news_rows
+
+
+async def use_llm_to_add_topic_features():
+    """
+
+    :return:
+    """
+    source_names = get_news_source_groupings()
+
+    for source_name in source_names:
+        misinfocounter_database = MONGO_CLIENT["misinfocounter"]
+        misinfocounter_collection = misinfocounter_database.get_collection("news_article_sentiments")
+        pipeline = [
+            {"$match": {"source_name": source_name}},
+            {"$sample": {"size": 100}},
+        ]
+        articles = misinfocounter_collection.find(pipeline)
+        # article_path = Path(CONFIG.root_path).joinpath("data/sample.json")
+        # article_text = await article_path.read_text()
+        # articles = json.loads(str(article_text))
+        for news_article in articles:
+            if "llm_topic" in news_article and news_article["llm_topic"] is not None:
+                continue
+            article_topic_feature = await get_topic_for_article({
+                "title": news_article["title"],
+                "content": news_article["content"],
+            })
+            print(f"article_topic_feature: {json.dumps(article_topic_feature, indent=4)}")
+            news_article["llm_major_topic"] = article_topic_feature["major_topic"]
+            news_article["llm_topic"] = article_topic_feature["topic"]
+            news_article["llm_continent"] = article_topic_feature["continent"]
+            news_article["llm_country"] = article_topic_feature["country"]
+            misinfocounter_collection.update_one({"id": news_article["id"]}, news_article)

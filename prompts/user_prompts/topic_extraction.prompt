@@ -1,0 +1,45 @@
+You are going to analyze an article that is provided to you in the following format:
+
+
+```json
+{
+    "id": "",
+    "title": "",
+    "content": "",
+}
+```
+
+The article format is defined as:
+* `id` the id of the article
+* `title`: the title of the article
+* `content`: the topics that are discussed in the article
+
+In each sentiment provided in `sentiment_scores`, you will be provided with:
+* `label`: the sentiment that was analyzed
+* `score`: the sentiment score for how the article was generally written.
+
+When analyzing the article, we want you to focus on identifying the topics of the article that are discussed and the sentiment that is expressed for each topic.
+
+In your response, provide the following information:
+* `id`: the id of the article
+* `major_topic`: the major topic umbrella that this article is dicsussing
+* `topic`: the topics that were extracted.
+* `content`: the continent the article is writing about
+* `country`: the country the article is writing about
+
+And output the following data:
+
+```json
+{
+    "id": str,
+    "title": str,
+    "major_topic": str,
+    "topic": str,
+    "continent": str,
+    "country": str,
+}
+```
+
+When providing the response, make sure to provide a complete json response. Do not leave a partial response.
+
+===== ARTICLE =====
