@@ -205,8 +205,13 @@ async def create_embeddings_for_raw_documents():
         misinfocounter_collection.update_one({"_id": news_article["_id"]}, {"$set": {"embedding": embedding_list}}, upsert=True)
 
 
-async def import_article_file_to_mongo():
+async def import_new_article_file_to_mongo(local_file_path: str):
     """
 
     :return:
     """
+    misinfocounter_database = MONGO_CLIENT["misinfocounter"]
+    misinfocounter_collection = misinfocounter_database.get_collection("news_article_sentiment_latest")
+    json_file_for_import = Path(CONFIG.root_path).joinpath(local_file_path)
+    json_for_import = await json_file_for_import.read_text()
+    misinfocounter_collection.insert_many(json.loads(json_for_import))

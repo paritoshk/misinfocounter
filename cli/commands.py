@@ -1,12 +1,13 @@
 import asyncio
 
+import click
+
 from data_analysis.send_data_to_mongo import send_test_data_to_mongo, \
     send_news_article_data_to_mongo_raw, send_news_article_data_to_mongo_with_sentiments, \
     use_llm_to_add_topic_features, create_embeddings_for_documents, \
-    create_embeddings_for_raw_documents
+    create_embeddings_for_raw_documents, import_new_article_file_to_mongo
 from data_analysis.simplified_sentiment_analyzer import analyze_news_sentiment
 from topic_models.news_source_topic_model import run_news_topic_model
-from counternews.generate_counter import change_tone
 
 def add_cli_commands(cli):
     """
@@ -61,4 +62,10 @@ def add_cli_commands(cli):
 
     @cli.command("refute_article_via_llm")
     def refute_article_via_llm():
-       response=change_tone("This is a test")
+        from counternews.generate_counter import change_tone
+        response=change_tone("This is a test")
+
+    @cli.command("import_new_file_to_mongo_articles")
+    @click.argument("file")
+    def import_new_file_to_mongo_articles(file: str):
+       asyncio.run(import_new_article_file_to_mongo(file))

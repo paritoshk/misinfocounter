@@ -26,7 +26,7 @@ client = OpenAI(
     api_key=OPENAPI_KEY,
 )
 
-def change_tone (article_text):
+def change_tone(article_text):
   response = client.chat.completions.create(
     model=MODEL,
     messages=[
