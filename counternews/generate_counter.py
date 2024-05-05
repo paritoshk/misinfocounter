@@ -35,7 +35,7 @@ client = OpenAI(
 )
 
 #PROMPT=f"You are a newspaper editor. You are submitted an article by a journalist in your team. Your job is to rewrite it and change the sentiment more {TONE}"
-PROMPT=f"You are government official, responding to the news article published, which a respone that is {TONE}. Keep your response down to {WORDCOUNT} word count."
+PROMPT=f"You are government official, responding to the news article published with a response that is {TONE} in tone. Keep your response down to {WORDCOUNT} word count."
 
 def change_tone (article_text):
   response = client.chat.completions.create(
